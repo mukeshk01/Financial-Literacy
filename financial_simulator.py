@@ -1,6 +1,5 @@
 import pandas as pd
 import random
-from IPython.display import display, HTML
 
 
 class FinancialSimulator:
@@ -169,13 +168,13 @@ class FinancialSimulator:
             'Metric': ['Cash', 'Income', 'Expenses', 'Debt', 'Investment', 'Net Worth', 'Debt Interest Rate', 'Savings Interest Rate', 'Investment Return Rate'],
             'Value': [f"{self.cash:.2f}", f"{self.income:.2f}", f"{self.expenses:.2f}", f"{self.debt:.2f}", f"{self.investment:.2f}", f"{self.net_worth:.2f}", f"{self.debt_interest_rate*100:.2f}%", f"{self.savings_interest_rate*100:.2f}%", f"{self.investment_return_rate*100:.2f}%"]
         })
-        display(HTML(status_df.to_html(index=False)))
+        return status_df
 
     def display_goals(self):
-        """Displays the current status of all financial goals."""
+        """Returns the current status of all financial goals as a DataFrame."""
         if not self.goals:
-            print("\n--- No Financial Goals Set ---")
-            return
+            return pd.DataFrame()
+        
         goal_data = []
         for name, details in self.goals.items():
             current_value = 0
@@ -196,8 +195,7 @@ class FinancialSimulator:
                 'Status': details['status']
             })
         goals_df = pd.DataFrame(goal_data)
-        print("\n--- Financial Goals Status ---")
-        display(HTML(goals_df.to_html(index=False)))
+        return goals_df
 
     def get_history(self):
         return self.history
