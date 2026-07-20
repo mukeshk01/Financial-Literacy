@@ -4,8 +4,8 @@ import random
 
 class FinancialSimulator:
     def __init__(self, initial_cash=1000, initial_income=2000, initial_expenses=1500, initial_debt=500,
-                 debt_interest_rate=0.01, savings_interest_rate=0.001,
-                 initial_investment=0, investment_return_rate=0.007):
+                 debt_interest_rate=1.0, savings_interest_rate=1.0,
+                 initial_investment=0, investment_return_rate=7.0):
         self.cash = initial_cash
         self.income = initial_income
         self.expenses = initial_expenses
