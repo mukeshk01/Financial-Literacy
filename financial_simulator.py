@@ -63,7 +63,7 @@ class FinancialSimulator:
             'type': goal_type,  # e.g., 'net_worth', 'cash', 'investment'
             'status': 'In Progress'  # Initial status
         }
-        print(f"Goal '{name}' set: Target {goal_type} of ${target_amount:.2f} by Month {target_month}.")
+        print(f"Goal '{name}' set: Target {goal_type} of ₹{target_amount:.2f} by Month {target_month}.")
 
     def update_goals(self):
         """Updates the status of all active goals."""
@@ -111,11 +111,11 @@ class FinancialSimulator:
         if event_type == 'expense':
             amount = random.randint(50, 500)
             self.cash -= amount
-            print(f"  Random Event: Unexpected expense of ${amount:.2f}")
+            print(f"  Random Event: Unexpected expense of ₹{amount:.2f}")
         elif event_type == 'income':
             amount = random.randint(100, 700)
             self.cash += amount
-            print(f"  Random Event: Bonus income of ${amount:.2f}")
+            print(f"  Random Event: Bonus income of ₹{amount:.2f}")
         else:
             print("  Random Event: No special event this month.")
 
@@ -188,8 +188,8 @@ class FinancialSimulator:
             goal_data.append({
                 'Goal Name': name,
                 'Type': details['type'],
-                'Target Amount': f"${details['target_amount']:.2f}",
-                'Current Value': f"${current_value:.2f}",
+                'Target Amount': f"₹{details['target_amount']:.2f}",
+                'Current Value': f"₹{current_value:.2f}",
                 'Target Month': details['target_month'],
                 'Current Month': self.month,
                 'Status': details['status']
