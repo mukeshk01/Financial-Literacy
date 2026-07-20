@@ -59,13 +59,13 @@ if scenario in scenarios:
     params = scenarios[scenario]
 else:
     params = {
-        "initial_cash": st.sidebar.number_input("Initial Cash ($)", 1000),
-        "initial_income": st.sidebar.number_input("Monthly Income ($)", 2000),
-        "initial_expenses": st.sidebar.number_input("Monthly Expenses ($)", 1500),
-        "initial_debt": st.sidebar.number_input("Initial Debt ($)", 500),
+        "initial_cash": st.sidebar.number_input("Initial Cash (₹)", 1000),
+        "initial_income": st.sidebar.number_input("Monthly Income (₹)", 2000),
+        "initial_expenses": st.sidebar.number_input("Monthly Expenses (₹)", 1500),
+        "initial_debt": st.sidebar.number_input("Initial Debt (₹)", 500),
         "debt_interest_rate": st.sidebar.slider("Debt Interest Rate (%)", 4.0, 10.0, 20.0) / 100,
         "savings_interest_rate": st.sidebar.slider("Savings Interest Rate (%)", 4.0, 6.0, 8.0) / 100,
-        "initial_investment": st.sidebar.number_input("Initial Investment ($)", 0),
+        "initial_investment": st.sidebar.number_input("Initial Investment (₹)", 0),
         "investment_return_rate": st.sidebar.slider("Investment Return Rate (%)", 1.0, 10.0, 20.0, 30.0) / 100,
     }
 
@@ -81,22 +81,22 @@ with col2:
     st.subheader("📊 Current Status")
     sim = st.session_state.simulator
     st.metric("Current Month", sim.month)
-    st.metric("Net Worth", f"${sim.net_worth:.2f}")
-    st.metric("Cash", f"${sim.cash:.2f}")
-    st.metric("Debt", f"${sim.debt:.2f}")
-    st.metric("Investments", f"${sim.investment:.2f}")
+    st.metric("Net Worth", f"₹{sim.net_worth:.2f}")
+    st.metric("Cash", f"₹{sim.cash:.2f}")
+    st.metric("Debt", f"₹{sim.debt:.2f}")
+    st.metric("Investments", f"₹{sim.investment:.2f}")
 
 with col1:
     st.subheader("💡 Financial Overview")
     overview_data = {
         "Metric": ["Cash", "Income", "Expenses", "Debt", "Investment", "Net Worth"],
         "Value": [
-            f"${sim.cash:.2f}",
-            f"${sim.income:.2f}",
-            f"${sim.expenses:.2f}",
-            f"${sim.debt:.2f}",
-            f"${sim.investment:.2f}",
-            f"${sim.net_worth:.2f}",
+            f"₹{sim.cash:.2f}",
+            f"₹{sim.income:.2f}",
+            f"₹{sim.expenses:.2f}",
+            f"₹{sim.debt:.2f}",
+            f"₹{sim.investment:.2f}",
+            f"₹{sim.net_worth:.2f}",
         ],
     }
     st.dataframe(pd.DataFrame(overview_data), hide_index=True, use_container_width=True)
@@ -109,7 +109,7 @@ col1, col2, col3 = st.columns(3)
 
 with col1:
     invest_amount = st.number_input(
-        "Amount to Invest ($)",
+        "Amount to Invest (₹)",
         min_value=0.0,
         step=100.0,
         value=0.0,
@@ -118,7 +118,7 @@ with col1:
 
 with col2:
     pay_debt_amount = st.number_input(
-        "Amount to Pay Debt ($)",
+        "Amount to Pay Debt (₹)",
         min_value=0.0,
         step=100.0,
         value=0.0,
@@ -131,7 +131,7 @@ with col3:
     set_goal = st.checkbox("Set Goal for this month?")
 
 if set_goal and goal_name:
-    goal_target = st.number_input("Target Amount ($)", min_value=0.0)
+    goal_target = st.number_input("Target Amount (₹)", min_value=0.0)
     goal_months = st.number_input("Months to achieve goal", min_value=1, value=12)
 
 # Advance month button
@@ -170,8 +170,8 @@ if st.session_state.simulator.goals:
         
         goal_data.append({
             "Goal": name,
-            "Target": f"${details['target_amount']:.2f}",
-            "Current": f"${current_value:.2f}",
+            "Target": f"₹{details['target_amount']:.2f}",
+            "Current": f"₹{current_value:.2f}",
             "Status": details["status"],
             "Progress": f"{progress_pct:.1f}%"
         })
@@ -192,7 +192,7 @@ if len(history_df) > 1:
         fig, ax = plt.subplots(figsize=(10, 6))
         ax.plot(history_df["Month"], history_df["Net Worth"], marker="o", linewidth=2, color="green")
         ax.set_xlabel("Month")
-        ax.set_ylabel("Net Worth ($)")
+        ax.set_ylabel("Net Worth (₹)")
         ax.set_title("Net Worth Over Time")
         ax.grid(True, alpha=0.3)
         st.pyplot(fig)
@@ -203,7 +203,7 @@ if len(history_df) > 1:
         ax.plot(history_df["Month"], history_df["Income"], marker="s", label="Income", linewidth=2, linestyle="--")
         ax.plot(history_df["Month"], history_df["Expenses"], marker="^", label="Expenses", linewidth=2, linestyle="--")
         ax.set_xlabel("Month")
-        ax.set_ylabel("Amount ($)")
+        ax.set_ylabel("Amount (₹)")
         ax.set_title("Cash Flow Analysis")
         ax.legend()
         ax.grid(True, alpha=0.3)
@@ -214,7 +214,7 @@ if len(history_df) > 1:
         ax.plot(history_df["Month"], history_df["Debt"], marker="o", label="Debt", linewidth=2, color="red")
         ax.plot(history_df["Month"], history_df["Investment"], marker="s", label="Investment", linewidth=2, color="blue")
         ax.set_xlabel("Month")
-        ax.set_ylabel("Amount ($)")
+        ax.set_ylabel("Amount (₹)")
         ax.set_title("Debt vs Investment Strategy")
         ax.legend()
         ax.grid(True, alpha=0.3)
