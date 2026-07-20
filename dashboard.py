@@ -63,10 +63,10 @@ else:
         "initial_income": st.sidebar.number_input("Monthly Income ($)", 2000),
         "initial_expenses": st.sidebar.number_input("Monthly Expenses ($)", 1500),
         "initial_debt": st.sidebar.number_input("Initial Debt ($)", 500),
-        "debt_interest_rate": st.sidebar.slider("Debt Interest Rate (%)", 0.1, 5.0, 1.0) / 100,
-        "savings_interest_rate": st.sidebar.slider("Savings Interest Rate (%)", 0.01, 1.0, 0.1) / 100,
+        "debt_interest_rate": st.sidebar.slider("Debt Interest Rate (%)", 4.0, 10.0, 20.0) / 100,
+        "savings_interest_rate": st.sidebar.slider("Savings Interest Rate (%)", 4.0, 6.0, 8.0) / 100,
         "initial_investment": st.sidebar.number_input("Initial Investment ($)", 0),
-        "investment_return_rate": st.sidebar.slider("Investment Return Rate (%)", 0.1, 2.0, 0.7) / 100,
+        "investment_return_rate": st.sidebar.slider("Investment Return Rate (%)", 1.0, 10.0, 20.0, 30.0) / 100,
     }
 
 # Initialize session state
