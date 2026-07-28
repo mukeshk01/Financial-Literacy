@@ -5,10 +5,10 @@ import random
 from financial_simulator import FinancialSimulator
 
 # Configure page
-st.set_page_config(page_title="Financial Literacy Simulator", layout="wide")
+st.set_page_config(page_title="Financial Planning Simulator", layout="wide")
 
 # Title
-st.title("💰 Financial Literacy Simulator")
+st.title("💰 Financial Planning Simulator")
 st.markdown("Learn financial management through interactive simulations!")
 
 # Sidebar for initial setup
