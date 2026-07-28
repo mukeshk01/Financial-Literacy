@@ -68,27 +68,73 @@ base_params = scenarios.get(scenario, {
 
 st.sidebar.markdown("### Edit scenario values (change defaults below)")
 # Make every scenario editable by exposing inputs pre-filled with the scenario defaults
-initial_cash = st.sidebar.number_input("Initial Cash (₹)", min_value=0.0, step=100.0, value=float(base_params.get("initial_cash", 1000)))
-initial_income = st.sidebar.number_input("Monthly Income (₹)", min_value=0.0, step=100.0, value=float(base_params.get("initial_income", 2000)))
-initial_expenses = st.sidebar.number_input("Monthly Expenses (₹)", min_value=0.0, step=100.0, value=float(base_params.get("initial_expenses", 1500)))
-initial_debt = st.sidebar.number_input("Initial Debt (₹)", min_value=0.0, step=100.0, value=float(base_params.get("initial_debt", 0)))
+initial_cash = st.sidebar.number_input(
+    "Initial Cash (₹)", min_value=0.0, step=100.0,
+    value=float(base_params.get("initial_cash", 1000)), key="initial_cash_input"
+)
+initial_income = st.sidebar.number_input(
+    "Monthly Income (₹)", min_value=0.0, step=100.0,
+    value=float(base_params.get("initial_income", 2000)), key="initial_income_input"
+)
+initial_expenses = st.sidebar.number_input(
+    "Monthly Expenses (₹)", min_value=0.0, step=100.0,
+    value=float(base_params.get("initial_expenses", 1500)), key="initial_expenses_input"
+)
+initial_debt = st.sidebar.number_input(
+    "Initial Debt (₹)", min_value=0.0, step=100.0,
+    value=float(base_params.get("initial_debt", 0)), key="initial_debt_input"
+)
 
-debt_interest_rate_pct = st.sidebar.slider("Debt Interest Rate (%)", min_value=0.0, max_value=30.0, value=float(base_params.get("debt_interest_rate", 0.05)) * 100.0, step=0.1)
-savings_interest_rate_pct = st.sidebar.slider("Savings Interest Rate (%)", min_value=0.0, max_value=10.0, value=float(base_params.get("savings_interest_rate", 0.01)) * 100.0, step=0.01)
-initial_investment = st.sidebar.number_input("Initial Investment (₹)", min_value=0.0, step=100.0, value=float(base_params.get("initial_investment", 0)))
-investment_return_rate_pct = st.sidebar.slider("Investment Return Rate (%)", min_value=0.0, max_value=30.0, value=float(base_params.get("investment_return_rate", 0.05)) * 100.0, step=0.1)
+debt_interest_rate_pct = st.sidebar.slider(
+    "Debt Interest Rate (%)", min_value=0.0, max_value=30.0,
+    value=float(base_params.get("debt_interest_rate", 0.05)) * 100.0, step=0.1,
+    key="debt_interest_rate_pct_input"
+)
+savings_interest_rate_pct = st.sidebar.slider(
+    "Savings Interest Rate (%)", min_value=0.0, max_value=10.0,
+    value=float(base_params.get("savings_interest_rate", 0.01)) * 100.0, step=0.01,
+    key="savings_interest_rate_pct_input"
+)
+initial_investment = st.sidebar.number_input(
+    "Initial Investment (₹)", min_value=0.0, step=100.0,
+    value=float(base_params.get("initial_investment", 0)), key="initial_investment_input"
+)
+investment_return_rate_pct = st.sidebar.slider(
+    "Investment Return Rate (%)", min_value=0.0, max_value=30.0,
+    value=float(base_params.get("investment_return_rate", 0.05)) * 100.0, step=0.1,
+    key="investment_return_rate_pct_input"
+)
 
-# Build params dict from the (possibly edited) inputs
+# Build params dict from the (possibly edited) inputs (read from session_state to pick up resets)
 params = {
-    "initial_cash": initial_cash,
-    "initial_income": initial_income,
-    "initial_expenses": initial_expenses,
-    "initial_debt": initial_debt,
-    "debt_interest_rate": debt_interest_rate_pct / 100.0,
-    "savings_interest_rate": savings_interest_rate_pct / 100.0,
-    "initial_investment": initial_investment,
-    "investment_return_rate": investment_return_rate_pct / 100.0,
+    "initial_cash": st.session_state.get("initial_cash_input", initial_cash),
+    "initial_income": st.session_state.get("initial_income_input", initial_income),
+    "initial_expenses": st.session_state.get("initial_expenses_input", initial_expenses),
+    "initial_debt": st.session_state.get("initial_debt_input", initial_debt),
+    "debt_interest_rate": st.session_state.get("debt_interest_rate_pct_input", debt_interest_rate_pct) / 100.0,
+    "savings_interest_rate": st.session_state.get("savings_interest_rate_pct_input", savings_interest_rate_pct) / 100.0,
+    "initial_investment": st.session_state.get("initial_investment_input", initial_investment),
+    "investment_return_rate": st.session_state.get("investment_return_rate_pct_input", investment_return_rate_pct) / 100.0,
 }
+
+# Reset scenario values to 0 button
+if st.sidebar.button("Reset Scenario Values to 0"):
+    keys_to_reset = [
+        "initial_cash_input",
+        "initial_income_input",
+        "initial_expenses_input",
+        "initial_debt_input",
+        "debt_interest_rate_pct_input",
+        "savings_interest_rate_pct_input",
+        "initial_investment_input",
+        "investment_return_rate_pct_input",
+    ]
+    for k in keys_to_reset:
+        # set slider/number inputs to 0 (streamlit will use these values on rerun)
+        st.session_state[k] = 0.0
+    # Clear any previewed goal
+    st.session_state["preview_goal"] = None
+    st.experimental_rerun()
 
 # Button to (re)apply scenario settings and reinitialize simulator
 if st.sidebar.button("Apply Scenario & Restart Simulation"):
@@ -140,7 +186,8 @@ with col1:
         min_value=0.0,
         step=100.0,
         value=0.0,
-        help="Money to move from cash to investments"
+        help="Money to move from cash to investments",
+        key="invest_amount_input"
     )
 
 with col2:
@@ -149,7 +196,8 @@ with col2:
         min_value=0.0,
         step=100.0,
         value=0.0,
-        help="Money to pay towards your debt"
+        help="Money to pay towards your debt",
+        key="pay_debt_amount_input"
     )
 
 with col3:
@@ -157,25 +205,47 @@ with col3:
     goal_name = st.text_input("Goal Name (optional)", key=f"goal_{sim.month}")
     set_goal = st.checkbox("Set Goal for this month?")
 
-if set_goal and goal_name:
-    goal_target = st.number_input("Target Amount (₹)", min_value=0.0)
-    goal_months = st.number_input("Months to achieve goal", min_value=1, value=12)
+    if set_goal and goal_name:
+        goal_target = st.number_input("Target Amount (₹)", min_value=0.0, key=f"goal_target_{sim.month}")
+        goal_months = st.number_input("Months to achieve goal", min_value=1, value=12, key=f"goal_months_{sim.month}")
+        # Go button to preview the goal without committing to simulator
+        if st.button("Go", key=f"go_button_{sim.month}"):
+            preview = {
+                "name": goal_name,
+                "target_amount": st.session_state.get(f"goal_target_{sim.month}", goal_target),
+                "target_month": sim.month + st.session_state.get(f"goal_months_{sim.month}", goal_months),
+                "type": "net_worth",
+            }
+            st.session_state["preview_goal"] = preview
+
+# If Go was clicked previously, show preview
+preview = st.session_state.get("preview_goal")
+if preview:
+    st.divider()
+    st.subheader("🔎 Goal Preview")
+    current_value = st.session_state.simulator.net_worth if preview.get("type") == "net_worth" else 0
+    progress_pct = (current_value / preview["target_amount"]) * 100 if preview["target_amount"] > 0 else 0
+    st.markdown(f"**Goal:** {preview['name']}  ")
+    st.markdown(f"**Target Amount:** ₹{preview['target_amount']:.2f}  ")
+    st.markdown(f"**Target Month:** {preview['target_month']}  ")
+    st.markdown(f"**Current (Net Worth):** ₹{current_value:.2f}  ")
+    st.progress(min(max(progress_pct / 100.0, 0.0), 1.0))
 
 # Advance month button
 if st.button("⏭️ Advance to Next Month", use_container_width=True, type="primary"):
-    # Set goal if specified
+    # Set goal if specified (this commits to simulator goals)
     if set_goal and goal_name:
         st.session_state.simulator.set_goal(
             goal_name,
-            goal_target,
-            sim.month + goal_months,
+            st.session_state.get(f"goal_target_{sim.month}" , goal_target),
+            sim.month + st.session_state.get(f"goal_months_{sim.month}", goal_months),
             "net_worth"
         )
     
     # Advance month
     st.session_state.simulator.advance_month(
-        invest_amount=invest_amount,
-        pay_debt_amount=pay_debt_amount
+        invest_amount=st.session_state.get("invest_amount_input", invest_amount),
+        pay_debt_amount=st.session_state.get("pay_debt_amount_input", pay_debt_amount)
     )
     st.rerun()
 
@@ -263,6 +333,8 @@ with col1:
 with col2:
     if st.button("🔄 Reset Simulation"):
         st.session_state.simulator = FinancialSimulator(**params)
+        # also clear preview
+        st.session_state["preview_goal"] = None
         st.rerun()
 
 # Footer
