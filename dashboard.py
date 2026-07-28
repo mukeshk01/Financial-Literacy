@@ -54,22 +54,49 @@ scenarios = {
     },
 }
 
-# Get scenario parameters
-if scenario in scenarios:
-    params = scenarios[scenario]
-else:
-    params = {
-        "initial_cash": st.sidebar.number_input("Initial Cash (₹)", 1000),
-        "initial_income": st.sidebar.number_input("Monthly Income (₹)", 2000),
-        "initial_expenses": st.sidebar.number_input("Monthly Expenses (₹)", 1500),
-        "initial_debt": st.sidebar.number_input("Initial Debt (₹)", 500),
-        "debt_interest_rate": st.sidebar.slider("Debt Interest Rate (%)", 4.0, 10.0, 20.0) / 100,
-        "savings_interest_rate": st.sidebar.slider("Savings Interest Rate (%)", 4.0, 6.0, 8.0) / 100,
-        "initial_investment": st.sidebar.number_input("Initial Investment (₹)", 0),
-        "investment_return_rate": st.sidebar.slider("Investment Return Rate (%)", 1.0, 10.0, 20.0, 30.0) / 100,
-    }
+# Base params depending on chosen scenario
+base_params = scenarios.get(scenario, {
+    "initial_cash": 1000,
+    "initial_income": 2000,
+    "initial_expenses": 1500,
+    "initial_debt": 500,
+    "debt_interest_rate": 0.05,
+    "savings_interest_rate": 0.01,
+    "initial_investment": 0,
+    "investment_return_rate": 0.05,
+})
 
-# Initialize session state
+st.sidebar.markdown("### Edit scenario values (change defaults below)")
+# Make every scenario editable by exposing inputs pre-filled with the scenario defaults
+initial_cash = st.sidebar.number_input("Initial Cash (₹)", min_value=0.0, step=100.0, value=float(base_params.get("initial_cash", 1000)))
+initial_income = st.sidebar.number_input("Monthly Income (₹)", min_value=0.0, step=100.0, value=float(base_params.get("initial_income", 2000)))
+initial_expenses = st.sidebar.number_input("Monthly Expenses (₹)", min_value=0.0, step=100.0, value=float(base_params.get("initial_expenses", 1500)))
+initial_debt = st.sidebar.number_input("Initial Debt (₹)", min_value=0.0, step=100.0, value=float(base_params.get("initial_debt", 0)))
+
+debt_interest_rate_pct = st.sidebar.slider("Debt Interest Rate (%)", min_value=0.0, max_value=30.0, value=float(base_params.get("debt_interest_rate", 0.05)) * 100.0, step=0.1)
+savings_interest_rate_pct = st.sidebar.slider("Savings Interest Rate (%)", min_value=0.0, max_value=10.0, value=float(base_params.get("savings_interest_rate", 0.01)) * 100.0, step=0.01)
+initial_investment = st.sidebar.number_input("Initial Investment (₹)", min_value=0.0, step=100.0, value=float(base_params.get("initial_investment", 0)))
+investment_return_rate_pct = st.sidebar.slider("Investment Return Rate (%)", min_value=0.0, max_value=30.0, value=float(base_params.get("investment_return_rate", 0.05)) * 100.0, step=0.1)
+
+# Build params dict from the (possibly edited) inputs
+params = {
+    "initial_cash": initial_cash,
+    "initial_income": initial_income,
+    "initial_expenses": initial_expenses,
+    "initial_debt": initial_debt,
+    "debt_interest_rate": debt_interest_rate_pct / 100.0,
+    "savings_interest_rate": savings_interest_rate_pct / 100.0,
+    "initial_investment": initial_investment,
+    "investment_return_rate": investment_return_rate_pct / 100.0,
+}
+
+# Button to (re)apply scenario settings and reinitialize simulator
+if st.sidebar.button("Apply Scenario & Restart Simulation"):
+    st.session_state.simulator = FinancialSimulator(**params)
+    st.session_state.month_decisions = []
+    st.experimental_rerun()
+
+# Initialize session state if not present
 if "simulator" not in st.session_state:
     st.session_state.simulator = FinancialSimulator(**params)
     st.session_state.month_decisions = []
