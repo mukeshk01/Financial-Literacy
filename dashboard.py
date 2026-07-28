@@ -31,6 +31,7 @@ scenarios = {
         "savings_interest_rate": 0.001,
         "initial_investment": 0,
         "investment_return_rate": 0.007,
+        "initial_family_income": 0,
     },
     "Young Professional": {
         "initial_cash": 5000,
@@ -41,6 +42,7 @@ scenarios = {
         "savings_interest_rate": 0.002,
         "initial_investment": 1000,
         "investment_return_rate": 0.01,
+        "initial_family_income": 0,
     },
     "Freelancer": {
         "initial_cash": 3000,
@@ -51,6 +53,7 @@ scenarios = {
         "savings_interest_rate": 0.001,
         "initial_investment": 2000,
         "investment_return_rate": 0.008,
+        "initial_family_income": 0,
     },
 }
 
@@ -64,6 +67,7 @@ base_params = scenarios.get(scenario, {
     "savings_interest_rate": 0.01,
     "initial_investment": 0,
     "investment_return_rate": 0.05,
+    "initial_family_income": 0,
 })
 
 st.sidebar.markdown("### Edit scenario values (change defaults below)")
@@ -75,6 +79,11 @@ initial_cash = st.sidebar.number_input(
 initial_income = st.sidebar.number_input(
     "Monthly Income (₹)", min_value=0.0, step=100.0,
     value=float(base_params.get("initial_income", 2000)), key="initial_income_input"
+)
+# New: Family income input (for household/family contribution)
+initial_family_income = st.sidebar.number_input(
+    "Family Monthly Income (₹)", min_value=0.0, step=100.0,
+    value=float(base_params.get("initial_family_income", 0)), key="initial_family_income_input"
 )
 initial_expenses = st.sidebar.number_input(
     "Monthly Expenses (₹)", min_value=0.0, step=100.0,
@@ -109,6 +118,7 @@ investment_return_rate_pct = st.sidebar.slider(
 params = {
     "initial_cash": st.session_state.get("initial_cash_input", initial_cash),
     "initial_income": st.session_state.get("initial_income_input", initial_income),
+    "initial_family_income": st.session_state.get("initial_family_income_input", initial_family_income),
     "initial_expenses": st.session_state.get("initial_expenses_input", initial_expenses),
     "initial_debt": st.session_state.get("initial_debt_input", initial_debt),
     "debt_interest_rate": st.session_state.get("debt_interest_rate_pct_input", debt_interest_rate_pct) / 100.0,
@@ -122,6 +132,7 @@ if st.sidebar.button("Reset Scenario Values to 0"):
     keys_to_reset = [
         "initial_cash_input",
         "initial_income_input",
+        "initial_family_income_input",
         "initial_expenses_input",
         "initial_debt_input",
         "debt_interest_rate_pct_input",
@@ -162,10 +173,11 @@ with col2:
 with col1:
     st.subheader("💡 Financial Overview")
     overview_data = {
-        "Metric": ["Cash", "Income", "Expenses", "Debt", "Investment", "Net Worth"],
+        "Metric": ["Cash", "Income", "Family Income", "Expenses", "Debt", "Investment", "Net Worth"],
         "Value": [
             f"₹{sim.cash:.2f}",
             f"₹{sim.income:.2f}",
+            f"₹{sim.family_income:.2f}",
             f"₹{sim.expenses:.2f}",
             f"₹{sim.debt:.2f}",
             f"₹{sim.investment:.2f}",
@@ -202,6 +214,7 @@ with col2:
 
 with col3:
     # Set goal
+    sim = st.session_state.simulator
     goal_name = st.text_input("Goal Name (optional)", key=f"goal_{sim.month}")
     set_goal = st.checkbox("Set Goal for this month?")
 
@@ -297,6 +310,9 @@ if len(history_df) > 1:
     with tab2:
         fig, ax = plt.subplots(figsize=(10, 6))
         ax.plot(history_df["Month"], history_df["Cash"], marker="o", label="Cash", linewidth=2)
+        # include family income in cash flow plot if available
+        if "Family Income" in history_df.columns:
+            ax.plot(history_df["Month"], history_df["Family Income"], marker="x", label="Family Income", linewidth=2, linestyle=":")
         ax.plot(history_df["Month"], history_df["Income"], marker="s", label="Income", linewidth=2, linestyle="--")
         ax.plot(history_df["Month"], history_df["Expenses"], marker="^", label="Expenses", linewidth=2, linestyle="--")
         ax.set_xlabel("Month")
