@@ -5,9 +5,10 @@ import random
 class FinancialSimulator:
     def __init__(self, initial_cash=1000, initial_income=2000, initial_expenses=1500, initial_debt=500,
                  debt_interest_rate=1.0, savings_interest_rate=1.0,
-                 initial_investment=0, investment_return_rate=7.0):
+                 initial_investment=0, investment_return_rate=7.0, initial_family_income=0):
         self.cash = initial_cash
         self.income = initial_income
+        self.family_income = initial_family_income  # New: additional family income
         self.expenses = initial_expenses
         self.debt = initial_debt
         self.debt_interest_rate = debt_interest_rate  # Monthly debt interest rate
@@ -22,7 +23,7 @@ class FinancialSimulator:
         self.goal_history = pd.DataFrame(columns=['Month'])  # To store goal progress over time
 
         # History to track progress
-        self.history = pd.DataFrame(columns=['Month', 'Cash', 'Income', 'Expenses', 'Debt', 'Investment', 'Net Worth'])
+        self.history = pd.DataFrame(columns=['Month', 'Cash', 'Income', 'Family Income', 'Expenses', 'Debt', 'Investment', 'Net Worth'])
         self._record_state()
 
     def _record_state(self):
@@ -30,6 +31,7 @@ class FinancialSimulator:
             'Month': self.month,
             'Cash': self.cash,
             'Income': self.income,
+            'Family Income': self.family_income,
             'Expenses': self.expenses,
             'Debt': self.debt,
             'Investment': self.investment,
@@ -122,8 +124,8 @@ class FinancialSimulator:
     def advance_month(self, invest_amount=0, pay_debt_amount=0):
         self.month += 1
 
-        # Basic monthly operations (income - expenses)
-        self.cash += self.income - self.expenses
+        # Basic monthly operations (income + family income - expenses)
+        self.cash += (self.income + self.family_income) - self.expenses
 
         # Apply debt interest
         if self.debt > 0:
@@ -165,8 +167,8 @@ class FinancialSimulator:
 
     def display_status(self):
         status_df = pd.DataFrame({
-            'Metric': ['Cash', 'Income', 'Expenses', 'Debt', 'Investment', 'Net Worth', 'Debt Interest Rate', 'Savings Interest Rate', 'Investment Return Rate'],
-            'Value': [f"{self.cash:.2f}", f"{self.income:.2f}", f"{self.expenses:.2f}", f"{self.debt:.2f}", f"{self.investment:.2f}", f"{self.net_worth:.2f}", f"{self.debt_interest_rate*100:.2f}%", f"{self.savings_interest_rate*100:.2f}%", f"{self.investment_return_rate*100:.2f}%"]
+            'Metric': ['Cash', 'Income', 'Family Income', 'Expenses', 'Debt', 'Investment', 'Net Worth', 'Debt Interest Rate', 'Savings Interest Rate', 'Investment Return Rate'],
+            'Value': [f"₹{self.cash:.2f}", f"₹{self.income:.2f}", f"₹{self.family_income:.2f}", f"₹{self.expenses:.2f}", f"₹{self.debt:.2f}", f"₹{self.investment:.2f}", f"₹{self.net_worth:.2f}", f"{self.debt_interest_rate*100:.2f}%", f"{self.savings_interest_rate*100:.2f}%", f"{self.investment_return_rate*100:.2f}%"]
         })
         return status_df
 
@@ -203,3 +205,4 @@ class FinancialSimulator:
     def get_goal_history(self):
         """Returns the history of goal progress."""
         return self.goal_history
+
